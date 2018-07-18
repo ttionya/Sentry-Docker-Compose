@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0
+# Version 1.0.1
 
 export PATH=$PATH:/usr/local/bin
 
@@ -8,7 +8,7 @@ mkdir -p ./backup
 
 log_file=./backup/backup.log
 current_time=`date '+%Y%m%d'`
-days_7ago_time=`date -d -7days '+%Y-%m-%d'`
+days_7ago_time=`date -d -7days '+%Y%m%d'`
 
 # Do
 echo "" >> $log_file
