@@ -6,7 +6,23 @@
 # See docs.getsentry.com/on-premise/server/ for full
 # instructions
 
-version: '3'
+version: '3.4'
+
+x-defaults:
+  &defaults
+  restart: unless-stopped
+  build: .
+  env_file: .env
+  depends_on:
+    - redis
+    - postgres
+    - memcached
+    - smtp
+  networks:
+    - web
+  volumes:
+    - ./data/sentry:/var/lib/sentry/files
+
 services:
   smtp:
     restart: unless-stopped
@@ -16,7 +32,7 @@ services:
 
   memcached:
     restart: unless-stopped
-    image: memcached:1.5
+    image: memcached:1.5-alpine
     networks:
       - web
 
@@ -37,50 +53,17 @@ services:
     #  - '5432:5432'
 
   web:
-    restart: unless-stopped
-    build: .
-    env_file: .env
-    depends_on:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    networks:
-      - web
-    volumes:
-      - ./data/sentry:/var/lib/sentry/files
+    <<: *defaults
     ports:
       - '127.0.0.1:9000:9000'
 
   cron:
-    restart: unless-stopped
-    build: .
+    <<: *defaults
     command: run cron
-    env_file: .env
-    depends_on:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    networks:
-      - web
-    volumes:
-      - ./data/sentry:/var/lib/sentry/files
       
   worker:
-    restart: unless-stopped
-    build: .
+    <<: *defaults
     command: run worker
-    env_file: .env
-    depends_on:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    networks:
-      - web
-    volumes:
-      - ./data/sentry:/var/lib/sentry/files
 
 networks:
   web:
